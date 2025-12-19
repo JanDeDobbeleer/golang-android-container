@@ -51,3 +51,13 @@ ENV CC $NDK_CC
 ENV GOOS android
 ENV GOARCH arm
 ENV GOARM 7
+
+# Create non-root app user and set ownership for runtime
+RUN groupadd -g 1000 app || true \
+    && useradd -u 1000 -g 1000 -m -d /home/app -s /bin/bash app || true \
+    && mkdir -p /work /home/app/.cache \
+    && chown -R app:app /opt/go /opt/android-ndk /work /home/app
+
+ENV HOME=/home/app
+WORKDIR /work
+USER app
