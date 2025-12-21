@@ -59,7 +59,8 @@ RUN groupadd -g 1000 app || true \
     && chown -R app:app /opt/go /opt/android-ndk /work /home/app
 
 # Configure sudoers for passwordless chown access
-RUN echo "app ALL=(ALL) NOPASSWD: /usr/bin/chown" >> /etc/sudoers
+RUN echo "app ALL=(ALL) NOPASSWD: /usr/bin/chown" > /etc/sudoers.d/app-chown \
+    && chmod 0440 /etc/sudoers.d/app-chown
 
 # Copy and configure entrypoint script
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
