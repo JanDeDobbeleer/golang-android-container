@@ -10,7 +10,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Dependencies
 RUN apt-get update \
-    && apt-get install --no-install-recommends build-essential wget unzip ca-certificates -y
+    && apt-get install --no-install-recommends build-essential wget unzip ca-certificates sudo -y
 
 # Setup NDK
 RUN mkdir /opt/android-ndk-tmp && cd /opt/android-ndk-tmp \
@@ -58,6 +58,16 @@ RUN groupadd -g 1000 app || true \
     && mkdir -p /work /home/app/.cache \
     && chown -R app:app /opt/go /opt/android-ndk /work /home/app
 
+# Configure sudoers for passwordless chown access
+RUN echo "app ALL=(ALL) NOPASSWD: /usr/bin/chown" >> /etc/sudoers
+
+# Copy and configure entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 ENV HOME=/home/app
 WORKDIR /work
 USER app
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/bin/bash"]
